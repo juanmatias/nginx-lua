@@ -1,9 +1,11 @@
 FROM alpine:3.8
 
-MAINTAINER Wang Shaobo <fireshooter@163.com>
+# Forked from the work of MAINTAINER Wang Shaobo <fireshooter@163.com>
+MAINTAINER Juan Matias Kungfu de la Camara Beovide <juanmatias@gmail.com>
+MAINTAINER Manuel Heavy Barrios <manuma2204@gmail.com>
 
 ENV LANG en_US.UTF-8
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+# RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 RUN apk update
 
@@ -87,10 +89,10 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
 	&& curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc  -o nginx.tar.gz.asc \
 	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEYS" \
+	&& gpg --keyserver keys.gnupg.net --recv-keys "$GPG_KEYS" \
 	&& gpg --batch --verify nginx.tar.gz.asc nginx.tar.gz \
-	&& rm -r "$GNUPGHOME" nginx.tar.gz.asc \
-	&& mkdir -p /usr/src \
+	&& rm -rf "$GNUPGHOME" nginx.tar.gz.asc \
+  && mkdir -p /usr/src \
 	&& tar -zxC /usr/src -f nginx.tar.gz \
 	&& rm nginx.tar.gz \
 	&& cd /usr/src/nginx-$NGINX_VERSION \
@@ -102,7 +104,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& mv objs/ngx_http_geoip_module.so objs/ngx_http_geoip_module-debug.so \
 	&& mv objs/ngx_http_perl_module.so objs/ngx_http_perl_module-debug.so \
 	&& ./configure $CONFIG \
-	&& make -j$(getconf _NPROCESSORS_ONLN) \
+  && make -j$(getconf _NPROCESSORS_ONLN) \
 	&& make install \
 	&& rm -rf /etc/nginx/html/ \
 	&& mkdir /etc/nginx/conf.d/ \
